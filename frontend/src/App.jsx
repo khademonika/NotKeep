@@ -1,122 +1,90 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import Sidebar from './components/Sidebar.jsx'
+import TopNavbar from "./components/TopNavbar.jsx";
+import Dashboard from "./Pages/Dashboard.jsx"
+import SearchPage from "./Pages/SearchPage.jsx"
+import ShowNotes from "./Pages/ShowNotes.jsx"
+import ProfilePage from "./Pages/ProfilePage.jsx"
+import SettingPage from "./Pages/SettingPage.jsx"
+import TodoPage from "./Pages/TodoPage.jsx"
 
-function App() {
-  const [count, setCount] = useState(0)
+
+import Note from "./Pages/Note.jsx"
+
+import { NOTES } from "./data/static.data.js"
+import CreateNote from "./Pages/CreateNote.jsx"
+
+export default function App() {
+  const [notes, setNotes] = useState(NOTES);
+  const [activePage, setActivePage] = useState("dashboard");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileAIOpen, setMobileAIOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [selectedNoteId, setSelectedNoteId] = useState(NOTES[0].id);
+
+  const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
+
+  const toggleFavorite = (id) =>
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, favorite: !n.favorite } : n)));
+
+  const openNote = (note) => {
+    setSelectedNoteId(note.id);
+    setActivePage("note-detail");
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="flex h-screen w-full bg-[#FAF8F5] font-sans">
+      <Sidebar
+        activePage={activePage}
+        setActivePage={setActivePage}
+        mobileOpen={mobileNavOpen}
+        setMobileOpen={setMobileNavOpen}
+      />
 
-      <div className="ticks"></div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TopNavbar
+          setMobileOpen={setMobileNavOpen}
+          setActivePage={setActivePage}
+          activePage={activePage}
+        />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="flex-1 overflow-y-auto">
+          {activePage === "dashboard" && (
+            <Dashboard
+              notes={notes}
+              setActivePage={setActivePage}
+              openNote={openNote}
+              openUploadModal={() => setUploadOpen(true)}
+              onToggleFavorite={toggleFavorite}
+            />
+          )}
+          {activePage === "create" && (
+            <CreateNote mobileAIOpen={mobileAIOpen} setMobileAIOpen={setMobileAIOpen} />
+          )}
+          {activePage === "search" && (
+            <SearchPage notes={notes} openNote={openNote} onToggleFavorite={toggleFavorite} />
+          )}
+          {activePage === "show" && (
+            <ShowNotes notes={notes} openNote={openNote} onToggleFavorite={toggleFavorite} />
+          )}
+          {activePage === "note-detail" && (
+            <Note
+              note={selectedNote}
+              onBack={() => setActivePage("show")}
+              onToggleFavorite={toggleFavorite}
+              mobileAIOpen={mobileAIOpen}
+              setMobileAIOpen={setMobileAIOpen}
+            />
+          )}
+          {activePage === "todo" && <TodoPage />}
+          {activePage === "settings" && <SettingPage />}
+          {activePage === "profile" && (
+            <ProfilePage setActivePage={setActivePage} notes={notes} />
+          )}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* <UploadPDFModal open={uploadOpen} onClose={() => setUploadOpen(false)} /> */}
+    </div>
+  );
 }
-
-export default App
