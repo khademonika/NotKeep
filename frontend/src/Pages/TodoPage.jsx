@@ -72,6 +72,7 @@ const TodoPage=()=> {
         />
         <input
           value={newDate}
+          type="date"
           onChange={(e) => setNewDate(e.target.value)}
           placeholder="Due date (optional)"
           className="w-full rounded-lg border border-[#E5E5E5] bg-[#FAF8F5] px-2.5 py-1.5 text-[12px] text-[#4A4A47] placeholder:text-[#9A988F] focus:outline-none sm:w-36"

@@ -1,5 +1,5 @@
 
-import { BookOpen, Bot, Check, HelpCircle, Layers, Lightbulb, ListChecks, Paperclip, Plus, Wand2, X } from "lucide-react";
+import { BookOpen, Bot, Check, FileIcon, HelpCircle, ImageIcon, Layers, Lightbulb, ListChecks, Paperclip, Plus, Wand2, X } from "lucide-react";
 import { useRef, useState } from "react";
 import TagPill from "../components/TagPill";
 import Canva from "../components/Canva";

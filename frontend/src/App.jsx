@@ -13,6 +13,9 @@ import Note from "./Pages/Note.jsx"
 
 import { NOTES } from "./data/static.data.js"
 import CreateNote from "./Pages/CreateNote.jsx"
+import LoginPage from "./Pages/LoginPage.jsx";
+import SignupPage from "./Pages/SignupPage.jsx";
+import LandingPage from "./Pages/LandingPage.jsx";
 
 export default function App() {
   const [notes, setNotes] = useState(NOTES);
@@ -21,6 +24,8 @@ export default function App() {
   const [mobileAIOpen, setMobileAIOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState(NOTES[0].id);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authView, setAuthView] = useState("landing");
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
 
@@ -31,6 +36,40 @@ export default function App() {
     setSelectedNoteId(note.id);
     setActivePage("note-detail");
   };
+
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+    setActivePage("dashboard");
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setAuthView("landing");
+  };
+
+  if (!isAuthenticated) {
+    if (authView === "login") {
+      return (
+        <LoginPage
+          goLanding={() => setAuthView("landing")}
+          goSignup={() => setAuthView("signup")}
+          onLoginSuccess={handleAuthSuccess}
+        />
+      );
+    }
+    if (authView === "signup") {
+      return (
+        <SignupPage
+          goLanding={() => setAuthView("landing")}
+          goLogin={() => setAuthView("login")}
+          onSignupSuccess={handleAuthSuccess}
+        />
+      );
+    }
+    return (
+      <LandingPage goLogin={() => setAuthView("login")} goSignup={() => setAuthView("signup")} />
+    );
+  }
 
   return (
     <div className="flex h-screen w-full bg-[#FAF8F5] font-sans">
