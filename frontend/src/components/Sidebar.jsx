@@ -1,6 +1,6 @@
 import Logo from "./Logo.jsx"
 import { NAV_ITEMS } from "../data/static.data.js"
-import { Bot, ChevronDown, Settings } from "lucide-react";
+import { Bot, ChevronDown, Settings, X } from "lucide-react";
 
 
 function SidebarContent({ activePage, setActivePage, onNavigate }) {

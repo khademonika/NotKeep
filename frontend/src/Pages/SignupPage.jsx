@@ -1,3 +1,25 @@
+import { useState } from "react";
+import { BrowserMockup } from "../components/MockupContent";
+import FloatingCard from "../components/FloatingCard";
+import { Eye, EyeOff, FileUp, HelpCircle, Loader2, Lock, Mail, Sparkles, User } from "lucide-react";
+import AuthInput from "../components/AuthInput";
+import { FaGithub } from "react-icons/fa";
+
+
+
+const floatCss = `
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+`;
+function GoogleMark() {
+  return (
+    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#4A4A47] text-[9px] font-bold text-white">
+      G
+    </span>
+  );
+}
 function SignupPage({ goLanding, goLogin, onSignupSuccess }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -138,7 +160,7 @@ function SignupPage({ goLanding, goLogin, onSignupSuccess }) {
               <GoogleMark /> Google
             </button>
             <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#E5E5E5] bg-white px-4 py-2.5 text-[12.5px] font-medium text-[#3D3D3A] hover:bg-[#F5F3EE]">
-              <Github className="h-4 w-4" /> GitHub
+              <FaGithub className="h-4 w-4" /> GitHub
             </button>
           </div>
 
