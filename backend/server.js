@@ -9,7 +9,7 @@ const app = express();
 createDB()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
 app.use('/api/notes', noteRoutes);
 
 app.listen(3000, () => {

@@ -1,65 +1,249 @@
-import Note from '../models/note.model.js';
+// controllers/note.controller.js
+
+import Note from "../models/Note.js";
+import Workspace from "../models/Workspace.js";
+import User from "../models/User.js";
 
 export const createNote = async (req, res) => {
-    try {
-        const { tag, title, content, user } = req.body;
-        const note = new Note({ tag, title, content, user });
-        await note.save();
-        res.status(201).json(note);
-    } catch (error) {
-        console.error('Error creating note:', error);
-        res.status(500).json({message: 'Internal server error'});
+  try {
+    const { title, icon, workspaceId, parentNote } = req.body;
+
+    // Check required field
+    if (!workspaceId) {
+      return res.status(400).json({
+        success: false,
+        message: "Workspace ID is required",
+      });
     }
+
+    // Create note
+    const note = await Note.create({
+      title: title || "Untitled",
+      icon: icon || "📝",
+      workspace: workspaceId,
+      parentNote: parentNote || null,
+      createdBy: req.user._id,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Note created successfully",
+      note,
+    });
+
+  } catch (error) {
+    console.error("Create Note Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to create note",
+      error: error.message,
+    });
+  }
 };
+
 
 export const getNotes = async (req, res) => {
-    try {
-        const notes = await Note.find();
-        res.status(200).json(notes);
-    } catch (error) {
-        console.error('Error fetching notes:', error);
-        res.status(500).json({message: 'Internal server error'});
-    } 
-};
+  try {
+    const { workspaceId } = req.params;
+
+    if (!workspaceId) {
+      return res.status(400).json({
+        success: false,
+        message: "Workspace ID is required",
+      });
+    }
+
+    const notes = await Note.find({
+      workspace: workspaceId,
+      createdBy: req.user._id,
+      isDeleted: false,
+    })
+      .sort({ createdAt: -1 })
+      .select("title icon parentNote createdBy createdAt updatedAt");
+
+    return res.status(200).json({
+      success: true,
+      count: notes.length,
+      notes,
+    });
+  } catch (error) {
+    console.error("Get Notes Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch notes",
+      error: error.message,
+    });
+  }
+}
 
 export const getNoteById = async (req, res) => {
-    try {
-        const note = await Note.findById(req.params.id);
-        if (!note) {
-            return res.status(404).json({message: 'Note not found'});
-        }
-        res.status(200).json(note);
-    } catch (error) {
-        console.error('Error fetching note:', error);
-        res.status(500).json({message: 'Internal server error'});
+  try {
+    const { noteId } = req.params;
+
+    if (!noteId) {
+      return res.status(400).json({
+        success: false,
+        message: "Note ID is required",
+      });
     }
+
+    const note = await Note.findOne({
+      _id: noteId,
+      createdBy: req.user._id,
+      isDeleted: false,
+    });
+
+    if (!note) {
+      return res.status(404).json({
+        success: false,
+        message: "Note not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      note,
+    });
+
+  } catch (error) {
+    console.error("Get Note By ID Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch note",
+      error: error.message,
+    });
+  }
 };
 
 export const updateNote = async (req, res) => {
-    try {
-        const { tag, title, content } = req.body;
-        const note = await Note.findByIdAndUpdate(req.params.id, { tag, title, content }, { new: true });
-        if (!note) {
-            return res.status(404).json({message: 'Note not found'});
-        }
-        res.status(200).json(note);
-    } catch (error) {
-        console.error('Error updating note:', error);
-        res.status(500).json({message: 'Internal server error'});
-    }       
+  try {
+    const { noteId } = req.params;
+    const { title, icon, content, parentNote } = req.body;
+
+    if (!noteId) {
+      return res.status(400).json({
+        success: false,
+        message: "Note ID is required",
+      });
+    }
+
+    const note = await Note.findOne({
+      _id: noteId,
+      createdBy: req.user._id,
+      isDeleted: false,
+    });
+
+    if (!note) {
+      return res.status(404).json({
+        success: false,
+        message: "Note not found",
+      });
+    }
+
+    // Update only the fields that are provided
+    if (title !== undefined) note.title = title;
+    if (icon !== undefined) note.icon = icon;
+    if (content !== undefined) note.content = content;
+    if (parentNote !== undefined) note.parentNote = parentNote;
+
+    const updatedNote = await note.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Note updated successfully",
+      note: updatedNote,
+    });
+
+  } catch (error) {
+    console.error("Update Note Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update note",
+      error: error.message,
+    });
+  }
 };
 
 export const deleteNote = async (req, res) => {
-    try {
-        const note = await Note.findByIdAndDelete(req.params.id);
-        if (!note) {
-            return res.status(404).json({message: 'Note not found'});
-        }
-        res.status(200).json({message: 'Note deleted successfully'});
+  try {
+    const { noteId } = req.params;
+
+    if (!noteId) {
+      return res.status(400).json({
+        success: false,
+        message: "Note ID is required",
+      });
     }
-    catch (error) {
-        console.error('Error deleting note:', error);
-        res.status(500).json({message: 'Internal server error'});
-    }   
+
+    const note = await Note.findOne({
+      _id: noteId,
+      createdBy: req.user._id,
+      isDeleted: false,
+    });
+
+    if (!note) {
+      return res.status(404).json({
+        success: false,
+        message: "Note not found",
+      });
+    }
+
+    // Soft delete
+    note.isDeleted = true;
+    note.deletedAt = new Date();
+
+    await note.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Note moved to trash",
+    });
+
+  } catch (error) {
+    console.error("Delete Note Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete note",
+      error: error.message,
+    });
+  }
 };
 
+export const toggleFavorite = async (req, res) => {
+  try {
+    const { noteId } = req.params;
+
+    const note = await Note.findOne({
+      _id: noteId,
+      createdBy: req.user._id,
+      isDeleted: false,
+    });
+
+    if (!note) {
+      return res.status(404).json({
+        success: false,
+        message: "Note not found",
+      });
+    }
+
+    note.isFavorite = !note.isFavorite;
+
+    await note.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Favorite updated",
+      note,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update favorite",
+    });
+  }
+};

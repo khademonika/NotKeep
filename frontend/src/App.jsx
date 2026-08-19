@@ -91,6 +91,7 @@ export default function App() {
           {activePage === "dashboard" && (
             <Dashboard
               notes={notes}
+              setNotes={setNotes}
               setActivePage={setActivePage}
               openNote={openNote}
               openUploadModal={() => setUploadOpen(true)}
