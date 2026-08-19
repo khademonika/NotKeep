@@ -1,7 +1,9 @@
 import { ChevronRight, FileUp, Plus, Wand2 } from "lucide-react";
 import NoteCard from "../components/NoteCard";
 import FavoriteNoteCard from "../components/FavoriteStar";
-
+import React, { useEffect, useState } from "react";
+import { getWorkspaceNotes } from "../services/noteApi";
+import { createNote } from "../services/noteApi";
 
 function HeroActionButton({ icon: Icon, label, primary, onClick }) {
   return (
@@ -21,7 +23,45 @@ function HeroActionButton({ icon: Icon, label, primary, onClick }) {
 
 const DashboardPage=({ notes, setActivePage, openNote, openUploadModal, onToggleFavorite })=> {
   const recent = notes.slice(0, 6);
-  const favorites = notes.filter((n) => n.favorite);
+
+const favorites = notes.filter(
+  (note) => note.isFavorite && !note.isDeleted
+);
+
+const noteCount = notes.filter(
+  (note) => !note.isDeleted
+).length;
+  const [Notes, setNotes] = useState([]);
+
+  const handleCreateNote = async () => {
+  try {
+    const data = await createNote(workspaceId);
+
+    const newNote = data.note;
+
+    // Open newly created note
+    openNote(newNote);
+
+  } catch (error) {
+    console.error("Create note error:", error);
+  }
+};
+  
+  useEffect(() => {
+  const loadNotes = async () => {
+    // if (!workspaceId) return;
+
+    try {
+      const data = await getWorkspaceNotes(workspaceId);
+
+      setNotes(data.notes || []);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    }
+  };
+
+  loadNotes();
+}, [workspaceId, setNotes]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
@@ -30,7 +70,7 @@ const DashboardPage=({ notes, setActivePage, openNote, openUploadModal, onToggle
           Good Morning, Alex
         </h1>
         <p className="mt-0.5 text-[12.5px] text-[#8A8880]">
-          You have {notes.length} notes
+          You have {noteCount} notes
         </p>
       </div>
 
@@ -45,7 +85,7 @@ const DashboardPage=({ notes, setActivePage, openNote, openUploadModal, onToggle
         <HeroActionButton
           icon={Wand2}
           label="Ask AI"
-          onClick={() => setActivePage("create")}
+          onClick={handleCreateNote}
         />
       </div>
 
@@ -62,7 +102,7 @@ const DashboardPage=({ notes, setActivePage, openNote, openUploadModal, onToggle
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {recent.map((note) => (
             <NoteCard
-              key={note.id}
+              key={note._id}
               note={note}
               onOpen={openNote}
               onToggleFavorite={onToggleFavorite}

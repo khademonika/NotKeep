@@ -1,11 +1,12 @@
 
 import { BookOpen, Bot, Check, FileIcon, HelpCircle, ImageIcon, Layers, Lightbulb, ListChecks, Paperclip, Plus, Wand2, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import TagPill from "../components/TagPill";
 import Canva from "../components/Canva";
 import MobileAISheet from "../components/MobileAISheet";
 import AIAssistantPanel from "../components/AIassistantPanel";
 import api from "../../api/axios";
+import { updateNote } from "../services/noteApi";
 const CREATE_CAPABILITIES = [
   { icon: BookOpen, label: "Summarize" },
   { icon: Lightbulb, label: "Explain" },
@@ -15,13 +16,14 @@ const CREATE_CAPABILITIES = [
   { icon: ListChecks, label: "Key Points" },
 ];
 
-const CreateNotePage=({ mobileAIOpen, setMobileAIOpen })=> {
+const CreateNotePage = ({ mobileAIOpen, setMobileAIOpen }) => {
   const [title, setTitle] = useState("");
   const [tag, setTag] = useState(null);
   const [tagPickerOpen, setTagPickerOpen] = useState(false);
   const [attachments, setAttachments] = useState([]);
-  const [body, setBody] = useState("");
+  const [content, setcontent] = useState([]);
   const [saved, setSaved] = useState(true);
+  const [saveStatus, setSaveStatus] = useState("Saved");
   const fileInputRef = useRef(null);
 
 
@@ -50,6 +52,59 @@ const CreateNotePage=({ mobileAIOpen, setMobileAIOpen })=> {
 
   const removeAttachment = (index) =>
     setAttachments((prev) => prev.filter((_, i) => i !== index));
+
+  const handleContentChange = (newContent) => {
+    setContent(newContent);
+  };
+  const createNote = () => {
+    // Logic to create a note using the title, tag, attachments, and content
+  };
+
+  const firstRender = useRef(true);
+
+  useEffect(() => {
+    // Initial note load par save mat karo
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
+    setSaveStatus("Saving...");
+
+    const timer = setTimeout(async () => {
+      try {
+        await updateNote(noteId, {
+          content,
+        });
+
+        setSaveStatus("Saved");
+      } catch (error) {
+        console.error("Autosave failed:", error);
+        setSaveStatus("Failed to save");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [content, noteId]);
+
+  useEffect(() => {
+    if (!noteId) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        await updateNote(noteId, {
+          title,
+          content,
+        });
+
+        setSaveStatus("Saved");
+      } catch (error) {
+        setSaveStatus("Failed to save");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [title, content, noteId]);
 
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col md:flex-row">
@@ -143,9 +198,9 @@ const CreateNotePage=({ mobileAIOpen, setMobileAIOpen })=> {
           <div className="my-5 border-t border-[#E5E5E5]" />
 
           <textarea
-            value={body}
+            value={content}
             onChange={(e) => {
-              setBody(e.target.value);
+              setcontent(e.target.value);
               markUnsaved();
             }}
             placeholder="Start writing your thoughts..."
@@ -153,14 +208,7 @@ const CreateNotePage=({ mobileAIOpen, setMobileAIOpen })=> {
           />
 
           <div className="mb-2 flex items-center gap-1.5 text-[11.5px] text-[#9A988F]">
-            {saved ? (
-              <>
-                <Check className="h-3 w-3" /> Saved
-              </>
-            ) : (
-              "Saving..."
-            )}
-            <button onClick={()=>handelCreateNote}>Save Note</button>
+            {saveStatus}
           </div>
 
           <Canva />

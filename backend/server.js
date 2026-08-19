@@ -11,7 +11,7 @@ app.use(cors())
 createDB()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
 app.use('/api/notes', noteRoutes);
 
 app.get("/api/test",(req,res)=>{
