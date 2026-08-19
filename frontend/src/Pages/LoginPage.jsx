@@ -1,6 +1,7 @@
 
 import { Eye, EyeOff, Layers, Loader2, Lock, Mail, Sparkles } from "lucide-react";
 import { useState } from "react";
+import api from "../../api/axios";
 import { BrowserMockup } from "../components/MockupContent";
 import FloatingCard from "../components/FloatingCard";
 import AuthInput from "../components/AuthInput";
@@ -28,14 +29,27 @@ function LoginPage({ goLanding, goSignup, onLoginSuccess }) {
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onLoginSuccess();
-    }, 900);
-  };
+  const handleLogin = async (e) => {
+  e.preventDefault()
+  setLoading(true)
+  try {
+    const res = await api.post("/users/login", {
+      email, password
+    })
+     console.log("Login response:", res.data);
+     onLoginSuccess()
+  } catch (error) {
+       console.error("Login failed:", error);
+
+    const message =
+      error.response?.data?.message || "Something went wrong. Please try again.";
+
+    alert(message);
+  }
+  finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen bg-[#FAF8F5]">

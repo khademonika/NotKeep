@@ -5,7 +5,7 @@ import TagPill from "../components/TagPill";
 import Canva from "../components/Canva";
 import MobileAISheet from "../components/MobileAISheet";
 import AIAssistantPanel from "../components/AIassistantPanel";
-
+import api from "../../api/axios";
 const CREATE_CAPABILITIES = [
   { icon: BookOpen, label: "Summarize" },
   { icon: Lightbulb, label: "Explain" },
@@ -24,11 +24,24 @@ const CreateNotePage=({ mobileAIOpen, setMobileAIOpen })=> {
   const [saved, setSaved] = useState(true);
   const fileInputRef = useRef(null);
 
+
+  const handelCreateNote = async ()=>{
+    try {
+      const res = await api.post("/notes/createNote",{
+        tag, title, content, user
+      })
+      console.log(res.data);
+      
+    } catch (error) {
+      console.log("Error in handleCreateNote function", error.message);
+      
+    }
+  }
   const markUnsaved = () => {
     setSaved(false);
     setTimeout(() => setSaved(true), 600);
   };
-
+  
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
     setAttachments((prev) => [...prev, ...files.map((f) => ({ name: f.name }))]);
@@ -147,6 +160,7 @@ const CreateNotePage=({ mobileAIOpen, setMobileAIOpen })=> {
             ) : (
               "Saving..."
             )}
+            <button onClick={()=>handelCreateNote}>Save Note</button>
           </div>
 
           <Canva />

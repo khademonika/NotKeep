@@ -7,7 +7,8 @@ import ShowNotes from "./Pages/ShowNotes.jsx"
 import ProfilePage from "./Pages/ProfilePage.jsx"
 import SettingPage from "./Pages/SettingPage.jsx"
 import TodoPage from "./Pages/TodoPage.jsx"
-
+import api from "../api/axios.js";
+import { Routes, Route } from 'react-router-dom'
 
 import Note from "./Pages/Note.jsx"
 
@@ -16,6 +17,7 @@ import CreateNote from "./Pages/CreateNote.jsx"
 import LoginPage from "./Pages/LoginPage.jsx";
 import SignupPage from "./Pages/SignupPage.jsx";
 import LandingPage from "./Pages/LandingPage.jsx";
+import { useEffect } from "react";
 
 export default function App() {
   const [notes, setNotes] = useState(NOTES);
@@ -28,7 +30,20 @@ export default function App() {
   const [authView, setAuthView] = useState("landing");
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
+  useEffect(() => {
+    const testBackend = async () => {
 
+      try {
+        const res = await api.get("/test")
+        console.log(res.data);
+
+      } catch (error) {
+        console.log("Error in connecting backend");
+
+      }
+    }
+    testBackend()
+  }, [])
   const toggleFavorite = (id) =>
     setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, favorite: !n.favorite } : n)));
 
@@ -87,7 +102,7 @@ export default function App() {
           activePage={activePage}
         />
 
-        <div className="flex-1 overflow-y-auto">
+        {/* <div className="flex-1 overflow-y-auto">
           {activePage === "dashboard" && (
             <Dashboard
               notes={notes}
@@ -120,10 +135,37 @@ export default function App() {
           {activePage === "profile" && (
             <ProfilePage setActivePage={setActivePage} notes={notes} />
           )}
-        </div>
+        </div> */}
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard
+            notes={notes}
+            setActivePage={setActivePage}
+            openNote={openNote}
+            openUploadModal={() => setUploadOpen(true)}
+            onToggleFavorite={toggleFavorite}
+          />} />
+          <Route path="/create" element={<CreateNote mobileAIOpen={mobileAIOpen} setMobileAIOpen={setMobileAIOpen}
+          />} />
+          <Route path="/search" element={<SearchPage notes={notes} openNote={openNote} onToggleFavorite={toggleFavorite} />} />
+          <Route path="/show" element={<ShowNotes notes={notes} openNote={openNote} onToggleFavorite={toggleFavorite} />} />
+          <Route path="/note" element={<Note
+            note={selectedNote}
+            onBack={() => setActivePage("show")}
+            onToggleFavorite={toggleFavorite}
+            mobileAIOpen={mobileAIOpen}
+            setMobileAIOpen={setMobileAIOpen}
+          />} />
+          <Route path="/todo" element={<TodoPage />} />
+          <Route path="/settings" element={<SettingPage />} />
+          <Route path="/profile" element={<ProfilePage setActivePage={setActivePage} notes={notes} />} />
+
+
+
+        </Routes>
       </div>
 
       {/* <UploadPDFModal open={uploadOpen} onClose={() => setUploadOpen(false)} /> */}
     </div>
+
   );
 }

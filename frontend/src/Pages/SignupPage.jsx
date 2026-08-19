@@ -4,7 +4,7 @@ import FloatingCard from "../components/FloatingCard";
 import { Eye, EyeOff, FileUp, HelpCircle, Loader2, Lock, Mail, Sparkles, User } from "lucide-react";
 import AuthInput from "../components/AuthInput";
 import { FaGithub } from "react-icons/fa";
-
+import api from "../../api/axios";
 
 
 const floatCss = `
@@ -21,7 +21,7 @@ function GoogleMark() {
   );
 }
 function SignupPage({ goLanding, goLogin, onSignupSuccess }) {
-  const [name, setName] = useState("");
+  const [username, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,15 +29,33 @@ function SignupPage({ goLanding, goLogin, onSignupSuccess }) {
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (!agree) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onSignupSuccess();
-    }, 900);
-  };
+
+  setLoading(true);
+
+  try {
+    const response = await api.post("/users/signup", {
+      username,
+      email,
+      password,
+    });
+
+    console.log("Signup successful:", response.data);
+
+    onSignupSuccess();
+  } catch (error) {
+    console.error("Signup failed:", error);
+
+    alert(
+      error.response?.data?.message ||
+      "Something went wrong. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen bg-[#FAF8F5]">
@@ -97,7 +115,7 @@ function SignupPage({ goLanding, goLogin, onSignupSuccess }) {
           </p>
 
           <form onSubmit={handleSignup} className="flex flex-col gap-3">
-            <AuthInput icon={User} placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
+            <AuthInput icon={User} placeholder="Full name" value={username} onChange={(e) => setName(e.target.value)} />
             <AuthInput
               icon={Mail}
               type="email"

@@ -1,42 +1,37 @@
 import Logo from "./Logo.jsx"
-import { NAV_ITEMS } from "../data/static.data.js"
-import { Bot, ChevronDown, Settings, X } from "lucide-react";
+import { Bot, ChevronDown, FilePlus2, FileText, Icon, LayoutDashboard, ListChecks, Search, Settings, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 function SidebarContent({ activePage, setActivePage, onNavigate }) {
   return (
     <div className="flex h-full flex-col justify-between py-5">
       <div>
-        <Logo
-          onClick={() => {
-            setActivePage("dashboard");
-            onNavigate && onNavigate();
-          }}
-        />
+       <Link to="/dashboard">
+        <Logo/>
+       </Link>
         <nav className="mt-8 flex flex-col gap-1 px-2">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const active =
-              activePage === item.id ||
-              (item.id === "show" && activePage === "note-detail");
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActivePage(item.id);
-                  onNavigate && onNavigate();
-                }}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors duration-150 ${
-                  active
-                    ? "bg-[#1E1E1E] text-[#FAF8F5]"
-                    : "text-[#4A4A47] hover:bg-[#F0EDE6]"
-                }`}
-              >
-                <Icon className="h-[17px] w-[17px]" strokeWidth={2} />
-                {item.label}
-              </button>
-            );
-          })}
+
+          <button className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors duration-150">
+            <LayoutDashboard  className="h-[17px] w-[17px]" strokeWidth={2} />
+             <Link to="/dashboard">Dashboard</Link>
+          </button>
+           <button className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors duration-150">
+             <FilePlus2 className="h-[17px] w-[17px]" strokeWidth={2} />
+             <Link to="create">Create Note</Link>
+          </button>
+           <button className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors duration-150">
+             <Search className="h-[17px] w-[17px]" strokeWidth={2} />
+             <Link to="search">Search Notes</Link>
+          </button>
+           <button className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors duration-150">
+             <FileText className="h-[17px] w-[17px]" strokeWidth={2} />
+             <Link to="show">Show Notes</Link>
+          </button>
+           <button className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors duration-150">
+             <ListChecks className="h-[17px] w-[17px]" strokeWidth={2} />
+             <Link to="todo">Todo</Link>
+          </button>
         </nav>
       </div>
 
@@ -62,8 +57,8 @@ function SidebarContent({ activePage, setActivePage, onNavigate }) {
               : "text-[#4A4A47] hover:bg-[#F0EDE6]"
           }`}
         >
-          <Settings className="h-[17px] w-[17px]" strokeWidth={2} />
-          Settings
+         
+         <Link to="settings">  <Settings className="h-[17px] w-[17px]" strokeWidth={2} /></Link>
         </button>
         <button
           onClick={() => {
@@ -108,6 +103,7 @@ const Sidebar=({ activePage, setActivePage, mobileOpen, setMobileOpen }) =>{
               setActivePage={setActivePage}
               onNavigate={() => setMobileOpen(false)}
             />
+
           </div>
         </div>
       )}
