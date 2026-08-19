@@ -1,6 +1,8 @@
 import { Moon, Palette } from "lucide-react";
 import SettingsRow from "../components/SettingsRow";
 import SettingsSection from "../components/SettingsSection";
+import { useState } from "react";
+import Toggle from "../components/Toggle";
 
 
 const SettingPage =()=> {
