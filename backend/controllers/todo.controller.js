@@ -1,5 +1,23 @@
 import ToDO from "../models/toDo.model.js"
 
+
+export const getTodosController = async (req, res) => {
+  try {
+    const todos = await ToDO.find().sort({ createdAt: -1 });
+
+    res.json({
+      message: "Todos fetched successfully",
+      todos,
+    });
+  } catch (error) {
+    console.log("Error in getTodosController:", error.message);
+
+    res.status(500).json({
+      message: "Failed to fetch todos"
+    });
+  }
+};
+
 export const createTodoController = async (req,res)=>{
     try {
         const {task, date, completed} = req.body

@@ -1,6 +1,7 @@
 import { CalendarDays, CheckSquare, Plus, Square, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { INITIAL_TODOS } from "../data/static.data";
+import { createTodo, getTodos } from "../services/todo.api.js";
 
 function TodoItem({ todo, onToggle, onDelete }) {
 
@@ -38,51 +39,50 @@ function TodoItem({ todo, onToggle, onDelete }) {
 }
 
 const TodoPage=()=> {
-  const [todos, setTodos] = useState(INITIAL_TODOS);
+  const [todos, setTodos] = useState([]);
   const [task, setTask] = useState("");
   const [newDate, setNewDate] = useState("");
 
-  const addTodo = () => {
-    if (!task.trim()) return;
-    setTodos((prev) => [
-      { id: Date.now(), title: task.trim(), dueDate: newDate.trim(), completed: false },
-      ...prev,
-    ]);
-    setTask("");
-    setNewDate("");
-  };
+  useEffect(()=>{
+    async function fetchTodos() {
+      const res = await getTodos()
+      setTodos(res.data.todos)
+      console.log(res.data.todos);
+      
+    }
+fetchTodos()
+ 
+  },[])
+     async function addTodo() {
+      const res = await createTodo({
+        task :task.trim(),
+        completed:false,
+        date:new Date || null
+      })
+      const newTodo = res.data
+      setTodos(prev=>[...prev, newTodo])
+      setTask("")
+      setNewDate("")
+    }
 
+   const handleDeleteTodo = async (id) => {
+    try {
+      await deleteTodo(id);
+
+      setTodos((prev) => prev.filter((t) => t._id !== id));
+    } catch (error) {
+      console.error(
+        "Error deleting todo:",
+        error.response?.data || error.message
+      );
+    }
+  };
   const toggleTodo = (id) =>
     setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
-  const deleteTodo = (id) => setTodos((prev) => prev.filter((t) => t.id !== id));
 
   const pending = todos.filter((t) => !t.completed);
   const completed = todos.filter((t) => t.completed);
-  const handleTodo = async()=>{
-    e.preventDefault()
-    try {
-      const res = await api.post("/todo/create-todo",{
-        task,
-        date,
-        completed
-      })
-      console.log("Todo data;", res.data);
-      
-    } catch (error) {
-      console.log("Error in handleTodo");
-      
-    }
-  }
-  const handleDeletetodo = async()=>{
-    try {
-      const res = await.post("/todo/delete-todo",{
-        
-      })
-    } catch (error) {
-      console.log("Error in handleDeletetodo");
-      
-    }
-  }
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:px-8 md:py-8">
       <h1 className="mb-6 text-[20px] font-semibold text-[#1E1E1E]">Todo</h1>
@@ -116,7 +116,7 @@ const TodoPage=()=> {
         </h2>
         <div className="flex flex-col gap-2">
           {pending.map((t) => (
-            <TodoItem key={t.id} todo={t} onToggle={toggleTodo} onDelete={deleteTodo} />
+            <TodoItem key={t.id} todo={t} onToggle={toggleTodo} onDelete={handleDeleteTodo} />
           ))}
           {pending.length === 0 && (
             <p className="text-[12.5px] text-[#9A988F]">Nothing pending. Nice work.</p>
@@ -130,7 +130,7 @@ const TodoPage=()=> {
         </h2>
         <div className="flex flex-col gap-2">
           {completed.map((t) => (
-            <TodoItem key={t.id} todo={t} onToggle={toggleTodo} onDelete={deleteTodo} />
+            <TodoItem key={t.id} todo={t} onToggle={toggleTodo} onDelete={handleDeleteTodo} />
           ))}
           {completed.length === 0 && (
             <p className="text-[12.5px] text-[#9A988F]">Nothing completed yet.</p>
