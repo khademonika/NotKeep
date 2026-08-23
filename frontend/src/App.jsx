@@ -7,7 +7,7 @@ import ShowNotes from "./Pages/ShowNotes.jsx"
 import ProfilePage from "./Pages/ProfilePage.jsx"
 import SettingPage from "./Pages/SettingPage.jsx"
 import TodoPage from "./Pages/TodoPage.jsx"
-import api from "../api/axios.js";
+import api from "./api/axios.js";
 import { Routes, Route } from 'react-router-dom'
 
 import Note from "./Pages/Note.jsx"
@@ -18,6 +18,7 @@ import LoginPage from "./Pages/LoginPage.jsx";
 import SignupPage from "./Pages/SignupPage.jsx";
 import LandingPage from "./Pages/LandingPage.jsx";
 import { useEffect } from "react";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 export default function App() {
   const [notes, setNotes] = useState(NOTES);
@@ -87,7 +88,8 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen w-full bg-[#FAF8F5] font-sans">
+    <AuthProvider>
+  <div className="flex h-screen w-full bg-[#FAF8F5] font-sans">
       <Sidebar
         activePage={activePage}
         setActivePage={setActivePage}
@@ -167,6 +169,8 @@ export default function App() {
 
       {/* <UploadPDFModal open={uploadOpen} onClose={() => setUploadOpen(false)} /> */}
     </div>
+    </AuthProvider>
+  
 
   );
 }

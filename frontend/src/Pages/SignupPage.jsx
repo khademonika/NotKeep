@@ -4,7 +4,7 @@ import FloatingCard from "../components/FloatingCard";
 import { Eye, EyeOff, FileUp, HelpCircle, Loader2, Lock, Mail, Sparkles, User } from "lucide-react";
 import AuthInput from "../components/AuthInput";
 import { FaGithub } from "react-icons/fa";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 
 const floatCss = `
@@ -36,7 +36,7 @@ function SignupPage({ goLanding, goLogin, onSignupSuccess }) {
   setLoading(true);
 
   try {
-    const response = await api.post("/users/signup", {
+    const response = await api.post("/auth/signup", {
       username,
       email,
       password,

@@ -1,7 +1,7 @@
 
 import { Eye, EyeOff, Layers, Loader2, Lock, Mail, Sparkles } from "lucide-react";
 import { useState } from "react";
-import api from "../../api/axios";
+import api from "../api/axios";
 import { BrowserMockup } from "../components/MockupContent";
 import FloatingCard from "../components/FloatingCard";
 import AuthInput from "../components/AuthInput";
@@ -33,7 +33,7 @@ function LoginPage({ goLanding, goSignup, onLoginSuccess }) {
   e.preventDefault()
   setLoading(true)
   try {
-    const res = await api.post("/users/login", {
+    const res = await api.post("/auth/login", {
       email, password
     })
      console.log("Login response:", res.data);

@@ -1,8 +1,8 @@
 // controllers/note.controller.js
 
-import Note from "../models/Note.js";
-import Workspace from "../models/Workspace.js";
-import User from "../models/User.js";
+import Note from "../models/note.model.js";
+import Workspace from "../models/workspace.model.js";
+import User from "../models/user.model.js";
 
 export const createNote = async (req, res) => {
   try {

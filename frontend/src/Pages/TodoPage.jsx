@@ -3,6 +3,7 @@ import { useState } from "react";
 import { INITIAL_TODOS } from "../data/static.data";
 
 function TodoItem({ todo, onToggle, onDelete }) {
+
   return (
     <div className="group flex items-center gap-3 rounded-xl border border-[#E5E5E5] bg-white px-4 py-3">
       <button onClick={() => onToggle(todo.id)} className="shrink-0 text-[#1E1E1E]">
@@ -38,16 +39,16 @@ function TodoItem({ todo, onToggle, onDelete }) {
 
 const TodoPage=()=> {
   const [todos, setTodos] = useState(INITIAL_TODOS);
-  const [newTitle, setNewTitle] = useState("");
+  const [task, setTask] = useState("");
   const [newDate, setNewDate] = useState("");
 
   const addTodo = () => {
-    if (!newTitle.trim()) return;
+    if (!task.trim()) return;
     setTodos((prev) => [
-      { id: Date.now(), title: newTitle.trim(), dueDate: newDate.trim(), completed: false },
+      { id: Date.now(), title: task.trim(), dueDate: newDate.trim(), completed: false },
       ...prev,
     ]);
-    setNewTitle("");
+    setTask("");
     setNewDate("");
   };
 
@@ -57,15 +58,39 @@ const TodoPage=()=> {
 
   const pending = todos.filter((t) => !t.completed);
   const completed = todos.filter((t) => t.completed);
-
+  const handleTodo = async()=>{
+    e.preventDefault()
+    try {
+      const res = await api.post("/todo/create-todo",{
+        task,
+        date,
+        completed
+      })
+      console.log("Todo data;", res.data);
+      
+    } catch (error) {
+      console.log("Error in handleTodo");
+      
+    }
+  }
+  const handleDeletetodo = async()=>{
+    try {
+      const res = await.post("/todo/delete-todo",{
+        
+      })
+    } catch (error) {
+      console.log("Error in handleDeletetodo");
+      
+    }
+  }
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:px-8 md:py-8">
       <h1 className="mb-6 text-[20px] font-semibold text-[#1E1E1E]">Todo</h1>
 
       <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-[#E5E5E5] bg-white p-3 sm:flex-row sm:items-center">
         <input
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addTodo()}
           placeholder="Add a task..."
           className="flex-1 bg-transparent px-1 text-[13.5px] text-[#1E1E1E] placeholder:text-[#9A988F] focus:outline-none"

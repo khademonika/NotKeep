@@ -1,7 +1,8 @@
 import express from 'express'
 const router = express.Router();
 
-import { createNote, getNotes, getNoteById, updateNote, deleteNote } from '../controllers/note.controller.js';
+import { createNote, getNotes, getNoteById, updateNote, deleteNote, toggleFavorite } from '../controllers/note.controller.js';
+import authMiddleware from '../middleware/auth.middleware.js';
 
 router.post('/createNote',authMiddleware, createNote);
 router.get('/getNotes', authMiddleware, getNotes);
